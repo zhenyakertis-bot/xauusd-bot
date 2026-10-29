@@ -9,8 +9,16 @@ services:
       LOG_DIR: /app/logs
       DATABASE_URL: sqlite:////app/data/bot.db
       CACHE_DIR: /app/cache
+      HEALTH_FILE: /app/data/health
+      BACKUP_DIR: /app/data/backups
+      TZ: UTC
     volumes:
       - ./data:/app/data
       - ./logs:/app/logs
       - ./cache:/app/cache
       - ./config:/app/config:ro
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

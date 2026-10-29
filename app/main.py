@@ -17,6 +17,7 @@ from app.data.factory import make_provider
 from app.live import LiveRunner, LogMessenger, Messenger
 from app.logging_setup import setup_logging
 from app.news import NewsFilter
+from app.storage.backup import backup
 from app.storage.db import Store
 from app.telegram.bot import SignalBot
 
@@ -59,6 +60,14 @@ async def run() -> None:
     async def report_job() -> None:
         await runner.daily_report(datetime.now(UTC))
 
+    async def backup_job() -> None:
+        try:
+            await asyncio.to_thread(
+                backup, settings.database_url, settings.backup_dir, settings.backup_keep
+            )
+        except Exception:
+            log.exception("database backup failed")
+
     scheduler = AsyncIOScheduler(timezone=UTC)
     # 20 s after each M5 close so the data provider has finalised the bar.
     scheduler.add_job(
@@ -78,6 +87,7 @@ async def run() -> None:
             timezone=ZoneInfo(cfg.market_hours.tz),
         ),
     )
+    scheduler.add_job(backup_job, CronTrigger(hour=0, minute=17, timezone=UTC))
     scheduler.start()
     log.info(
         "bot started",

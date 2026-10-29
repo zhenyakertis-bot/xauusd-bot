@@ -34,6 +34,8 @@ class Settings(BaseSettings):
     database_url: str = "sqlite:///data/bot.db"
     strategy_config: Path = Path("config/strategy.yaml")
     health_file: Path = Path("data/health")  # touched every cycle; Docker healthcheck reads it
+    backup_dir: Path = Path("data/backups")
+    backup_keep: int = Field(default=14, ge=1)
 
     @field_validator(
         "paper_balance",

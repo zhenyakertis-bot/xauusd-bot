@@ -22,4 +22,8 @@ COPY config ./config
 RUN mkdir -p /app/data /app/logs /app/cache && chown -R bot:bot /app
 USER bot
 
+# Healthy while the live loop keeps touching data/health (every 5 min).
+HEALTHCHECK --interval=2m --timeout=20s --start-period=2m --retries=3 \
+    CMD ["python", "-m", "app.healthcheck"]
+
 CMD ["python", "-m", "app.main"]
