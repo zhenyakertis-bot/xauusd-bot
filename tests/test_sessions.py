@@ -19,7 +19,8 @@ from app.sessions import (
 )
 
 CFG = load_strategy(Path(__file__).resolve().parents[1] / "config" / "strategy.yaml")
-S = CFG.sessions
+# Pin the spec: Asia defines a range only. The yaml may enable Asia signals for testing.
+S = {**CFG.sessions, "asia": CFG.sessions["asia"].model_copy(update={"signals": False})}
 
 
 def utc(*args: int) -> datetime:
@@ -69,6 +70,12 @@ def test_session_boundaries_start_inclusive_end_exclusive() -> None:
 def test_active_signal_session(ts: datetime, expected: str | None) -> None:
     inst = active_signal_session(S, ts)
     assert (inst.name if inst else None) == expected
+
+
+def test_asia_signals_when_enabled() -> None:
+    sessions = {**S, "asia": S["asia"].model_copy(update={"signals": True})}
+    inst = active_signal_session(sessions, utc(2026, 10, 29, 3, 0))
+    assert inst is not None and inst.name == "asia" and inst.label == "Asia"
 
 
 def test_label_from_config() -> None:

@@ -18,12 +18,12 @@ sessions:
     tz: America/New_York
     start: "08:00"
     end: "11:00"
-  asia:            # no signals; only defines the Asian high/low liquidity range
+  asia:            # Asian high/low liquidity range; signals ON for the test period
     label: Asia
     tz: Asia/Tokyo
     start: "09:00"
     end: "15:00"
-    signals: false
+    signals: true    # TEMP test period (owner request). Backtest: Asia -3.5R on 7 trades. Revert: false
 
 structure:
   swing_lookback: 3          # fractal on M15: N candles on each side
