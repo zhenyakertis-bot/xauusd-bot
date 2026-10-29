@@ -1,0 +1,16 @@
+services:
+  bot:
+    build: .
+    image: xauusd-bot:latest
+    container_name: xauusd-bot
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      LOG_DIR: /app/logs
+      DATABASE_URL: sqlite:////app/data/bot.db
+      CACHE_DIR: /app/cache
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./cache:/app/cache
+      - ./config:/app/config:ro

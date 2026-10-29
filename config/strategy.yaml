@@ -1,0 +1,93 @@
+# All strategy parameters. Changing values here changes behaviour; nothing is hardcoded.
+
+instrument:            # match your broker / prop firm contract spec
+  symbol: XAUUSD
+  price_precision: 2
+  contract_size: 100   # ounces per 1.00 lot
+  lot_step: 0.01
+  min_lot: 0.01
+
+sessions:
+  london:
+    label: London
+    tz: Europe/London
+    start: "07:00"
+    end: "10:00"
+  new_york:
+    label: New York
+    tz: America/New_York
+    start: "08:00"
+    end: "11:00"
+  asia:            # no signals; only defines the Asian high/low liquidity range
+    label: Asia
+    tz: Asia/Tokyo
+    start: "09:00"
+    end: "15:00"
+    signals: false
+
+structure:
+  swing_lookback: 3          # fractal on M15: N candles on each side
+  entry_swing_lookback: 2    # fractal on M5
+  bias_timeframe: M15
+  entry_timeframe: M5
+  choch_sets_bias: true      # V3: a CHoCH also sets bias (spec default: false)
+  require_premium_discount: false  # V3 (spec default: true)
+  equilibrium: 0.5           # 50% of last swing range
+  lookback_bars_bias: 400    # M15 bars the engine looks at
+  lookback_bars_entry: 300   # M5 bars the engine looks at
+
+liquidity:
+  eq_tolerance: 1.0          # V3: price units for equal highs/lows (was 0.30)
+  use_asian_range: true
+  use_previous_day: true
+  use_equal_levels: true
+  eq_lookback_swings: 10     # recent M15 swings compared for equal highs/lows
+  use_swing_targets: true    # unswept M15 swing highs/lows count as TP liquidity
+  sweep_timeframes: [M5, M15]
+  sweep_max_age_minutes: 240 # V3: sweep must be this recent (was 120)
+
+confirmation:
+  atr_period: 14
+  displacement_atr_mult: 1.5
+  min_fvg_size: 0.50         # price units
+  ob_max_lookback: 10        # bars back from displacement to find the order block
+  impulse_max_gap_bars: 3    # displacement candle within N M5 bars of the structure break
+  max_age_bars: 3            # setup must have completed within the last N M5 bars
+
+trade:
+  sl_spread_mult: 2.0        # sl_buffer = max(spread * k, ATR * m)
+  sl_atr_mult: 0.25
+  min_rr_tp1: 2.0
+  tp2_r: 3.0
+  entry_expiry_minutes: 90
+  entry_mode: proximal       # proximal: zone edge reached first | mid: zone middle
+  assumed_spread: 0.30       # used when the feed has no bid/ask (Twelve Data)
+  tp1_close_fraction: 0.5    # share closed at TP1; the rest runs to TP2 with SL at breakeven
+
+signals:
+  signal_cooldown_minutes: 30
+  max_signals_per_session: 2
+  max_active_per_direction: 1
+  price_rounding: 0.10       # for dedup key
+
+news_filter:
+  enabled: false
+  window_minutes: 30
+  currencies: [USD]
+  impact: [High]
+
+market_hours:               # spot gold (America/New_York time)
+  tz: America/New_York
+  daily_close: "17:00"       # daily break 17:00-18:00, weekly close Fri 17:00
+  daily_open: "18:00"        # weekly open Sun 18:00
+
+monitoring:
+  heartbeat_stale_minutes: 15
+  daily_report_after: "11:30"   # America/New_York, after NY kill zone
+
+backtest:
+  spread: 0.30               # fixed spread if use_data_spread is false / data has none
+  use_data_spread: true      # Dukascopy bars carry the real average bid/ask spread
+  slippage: 0.05             # against us on stop-loss exits
+  warmup_days: 5             # history loaded before --from for swings / previous day
+  in_sample_ratio: 0.7

@@ -1,0 +1,58 @@
+[project]
+name = "xauusd-bot"
+version = "0.1.0"
+description = "Paper-signal Telegram bot for XAUUSD (Smart Money Concepts, London/NY kill zones)"
+requires-python = ">=3.11"
+dependencies = [
+    "httpx>=0.27",
+    "python-telegram-bot>=21.0",
+    "pandas>=2.2",
+    "numpy>=1.26",
+    "pydantic>=2.6",
+    "pydantic-settings>=2.2",
+    "pyyaml>=6.0",
+    "sqlalchemy>=2.0",
+    "apscheduler>=3.10,<4",
+    "python-json-logger>=2.0",
+    "pyarrow>=15.0",
+    "matplotlib>=3.8",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "respx>=0.21",
+    "ruff>=0.4",
+    "mypy>=1.10",
+    "types-PyYAML",
+    "pandas-stubs",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]
+allowed-confusables = ["–", "×"]  # used on purpose in Telegram messages
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+ignore_missing_imports = true
+plugins = ["pydantic.mypy"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+markers = ["live: tests that hit real external APIs (need credentials)"]
+addopts = "-m 'not live'"
